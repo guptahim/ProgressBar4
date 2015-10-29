@@ -1,0 +1,72 @@
+<!doctype html>		
+
+<html lang='en-GB'>
+	<head>
+		<link rel="stylesheet" type="text/css" href="ProgressBar.css">
+	</head>
+
+	<body>
+		<div id='container'></div>
+		<script id="template" type='text/ractive'>
+			<h1>Progress Bars Demo</h1>
+
+			{{#each progressBars}}
+				{{#if value<=100}}
+					<div class="progress-bar-fill-blue" style="width: {{barValue(value/2)}}%; text-align:center; border:1px solid gray">
+						<span class="progress-label">{{barValue(value)}}%</span>
+					</div>
+				{{/if}}
+				
+				{{#if value>100}}
+					<div class="progress-bar-fill-red" style="width: 50%; text-align:center; border:1px solid gray">
+						<span class="progress-label">{{value}}%</span>
+					</div>
+				{{/if}}
+				<br>
+			{{/each}}
+			 
+			<select value='{{selectedProgressBar}}'>
+				{{#each progressBars :index}}
+					<option value='{{index}}'>{{name}}</option>
+				{{/each}}
+			</select>
+		   
+			{{#each buttonValues}}
+				<button disabled='{{selectedProgressBar == null}}' on-click='adjustProgressBar(this)'>{{this > 0 ? '+' : ''}}{{this}}</button>
+			{{/each}}
+		</script>
+
+		<script src='http://cdn.ractivejs.org/latest/ractive.min.js'></script>
+
+		<script>
+			var ractive = new Ractive({
+				el: document.body,
+				template: '#template',
+				data: {
+					progressBars: [
+						{ name: 'ProgressBar1', value: 0 },
+						{ name: 'ProgressBar2', value: 0 },
+						{ name: 'ProgressBar3', value: 0 }
+					],
+					buttonValues: [ +25, +10, -10, -25 ],
+					barValue: function(val) {
+						if(val<=0) {
+							val=0;
+						}
+						return val;
+					}
+				},
+				adjustProgressBar: function(buttonVal) {
+					var selectedProgressBarIndex = this.get('selectedProgressBar');
+					if (selectedProgressBarIndex == null) return;
+					
+					var keyPath = 'progressBars[' + selectedProgressBarIndex + '].value';
+					if((this.get(keyPath))<=0) {
+						this.set(keyPath,0)
+					}
+					this.add(keyPath, buttonVal);
+				}
+			});
+		</script>
+	</body>
+</html>
